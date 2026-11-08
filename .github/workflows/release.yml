@@ -1,0 +1,20 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Print the computed version without tagging or releasing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/semver-release.yml
+    with:
+      dry-run: ${{ inputs.dry-run }}

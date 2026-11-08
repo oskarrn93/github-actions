@@ -22,6 +22,6 @@ jobs:
 
 `semver-release.yml` infers the next `vMAJOR.MINOR.PATCH` from conventional commits since the latest tag (`!`/`BREAKING CHANGE` → major, `feat` → minor, `fix`/`perf` → patch, anything else → no release), creates the GitHub release, and moves `vMAJOR`. The caller's job needs `permissions: contents: write`.
 
-Releases: publish a GitHub release tagged `vMAJOR.MINOR.PATCH`; `major-tag.yml` then moves the floating `vMAJOR` tag to that commit.
+Releases: run the `Release` workflow (`release.yml`, manual, dry run by default) to cut one from conventional commits, or publish a GitHub release tagged `vMAJOR.MINOR.PATCH`; `major-tag.yml` then moves the floating `vMAJOR` tag to that commit.
 
 Composite actions go in `actions/<name>/action.yml`, used as `oskarrn93/github-actions/actions/<name>@<sha>`.
