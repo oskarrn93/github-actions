@@ -29,10 +29,14 @@ jobs:
           go-version-file: go.mod
       - if: inputs.gofmt
         run: test -z "$(gofmt -l .)" || (gofmt -l .; exit 1)
-      - run: go vet ${PACKAGES}
+      - run: |
+          # shellcheck disable=SC2086 # unquoted so multiple patterns split into separate args
+          go vet ${PACKAGES}
         env:
           PACKAGES: ${{ inputs.packages }}
-      - run: go test ${RACE:+-race} ${PACKAGES}
+      - run: |
+          # shellcheck disable=SC2086 # unquoted so multiple patterns split into separate args
+          go test ${RACE:+-race} ${PACKAGES}
         env:
           PACKAGES: ${{ inputs.packages }}
           RACE: ${{ inputs.race && 'true' || '' }}
