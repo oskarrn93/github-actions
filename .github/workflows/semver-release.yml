@@ -41,13 +41,13 @@ jobs:
           subjects=$(git log --format=%s "$range")
           bodies=$(git log --format=%b "$range")
 
-          bump=none
+          bump="none"
           if grep -qE '^BREAKING[ -]CHANGE:' <<<"$bodies" || grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$subjects"; then
-            bump=major
+            bump="major"
           elif grep -qE '^feat(\([^)]*\))?:' <<<"$subjects"; then
-            bump=minor
+            bump="minor"
           elif grep -qE '^(fix|perf)(\([^)]*\))?:' <<<"$subjects"; then
-            bump=patch
+            bump="patch"
           fi
 
           if [[ "$bump" == none ]]; then
