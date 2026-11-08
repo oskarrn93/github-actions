@@ -18,6 +18,9 @@ jobs:
 | `govulncheck.yml` | `packages` (`./...`), `version` |
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
 | `actionlint.yml` | none |
+| `semver-release.yml` | `dry-run` (false), `move-major-tag` (true) |
+
+`semver-release.yml` infers the next `vMAJOR.MINOR.PATCH` from conventional commits since the latest tag (`!`/`BREAKING CHANGE` → major, `feat` → minor, `fix`/`perf` → patch, anything else → no release), creates the GitHub release, and moves `vMAJOR`. The caller's job needs `permissions: contents: write`.
 
 Releases: publish a GitHub release tagged `vMAJOR.MINOR.PATCH`; `release.yml` then moves the floating `vMAJOR` tag to that commit.
 
