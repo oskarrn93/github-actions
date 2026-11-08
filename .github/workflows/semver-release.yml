@@ -11,6 +11,12 @@ on:
         description: Move the floating vMAJOR tag to the new release
         type: boolean
         default: true
+      create-release:
+        description: >-
+          Create the GitHub release. When false only the tag is pushed, for callers whose own
+          tag-triggered workflow publishes the release once its assets are ready
+        type: boolean
+        default: true
       client-id:
         description: >-
           Client ID of a GitHub App. With app-private-key, the release is created with an App
@@ -47,6 +53,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
           DRY_RUN: ${{ inputs.dry-run }}
           MOVE_MAJOR_TAG: ${{ inputs.move-major-tag }}
+          CREATE_RELEASE: ${{ inputs.create-release }}
         run: |
           last=$(git tag --list --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
           range=HEAD
@@ -87,7 +94,12 @@ jobs:
             exit 0
           fi
 
-          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
+          if [[ "$CREATE_RELEASE" == true ]]; then
+            gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
+          else
+            git tag "$tag" "$GITHUB_SHA"
+            git push origin "refs/tags/$tag"
+          fi
 
           # Releases created with GITHUB_TOKEN don't trigger other workflows,
           # so the floating tag has to be moved here.
