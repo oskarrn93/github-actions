@@ -1,0 +1,79 @@
+name: Semver release
+
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        description: Print the computed version without tagging or releasing
+        type: boolean
+        default: false
+      move-major-tag:
+        description: Move the floating vMAJOR tag to the new release
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry-run }}
+          MOVE_MAJOR_TAG: ${{ inputs.move-major-tag }}
+        run: |
+          last=$(git tag --list --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
+          range=HEAD
+          if [[ -n "$last" ]]; then
+            range="$last..HEAD"
+          else
+            last=v0.0.0
+          fi
+
+          subjects=$(git log --format=%s "$range")
+          bodies=$(git log --format=%b "$range")
+
+          bump="none"
+          if grep -qE '^BREAKING[ -]CHANGE:' <<<"$bodies" || grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$subjects"; then
+            bump="major"
+          elif grep -qE '^feat(\([^)]*\))?:' <<<"$subjects"; then
+            bump="minor"
+          elif grep -qE '^(fix|perf)(\([^)]*\))?:' <<<"$subjects"; then
+            bump="patch"
+          fi
+
+          if [[ "$bump" == none ]]; then
+            echo "No releasable commits since $last"
+            exit 0
+          fi
+
+          IFS=. read -r major minor patch <<<"${last#v}"
+          case "$bump" in
+            major) major=$((major + 1)); minor=0; patch=0 ;;
+            minor) minor=$((minor + 1)); patch=0 ;;
+            patch) patch=$((patch + 1)) ;;
+          esac
+          tag="v$major.$minor.$patch"
+          echo "$last -> $tag ($bump)"
+
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "Dry run, not releasing"
+            exit 0
+          fi
+
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
+
+          # Releases created with GITHUB_TOKEN don't trigger other workflows,
+          # so the floating tag has to be moved here.
+          if [[ "$MOVE_MAJOR_TAG" == true ]]; then
+            git tag -f "v$major" "$GITHUB_SHA"
+            git push -f origin "refs/tags/v$major"
+          fi
