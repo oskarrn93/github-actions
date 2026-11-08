@@ -18,4 +18,6 @@ jobs:
 | `govulncheck.yml` | `packages` (`./...`), `version` |
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
 
+Releases: publish a GitHub release tagged `vMAJOR.MINOR.PATCH`; `release.yml` then moves the floating `vMAJOR` tag to that commit.
+
 Composite actions go in `actions/<name>/action.yml`, used as `oskarrn93/github-actions/actions/<name>@<sha>`.
