@@ -17,6 +17,7 @@ jobs:
 |---|---|
 | `govulncheck.yml` | `packages` (`./...`), `version` |
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
+| `actionlint.yml` | none |
 
 Releases: publish a GitHub release tagged `vMAJOR.MINOR.PATCH`; `release.yml` then moves the floating `vMAJOR` tag to that commit.
 
