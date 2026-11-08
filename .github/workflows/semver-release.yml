@@ -11,6 +11,16 @@ on:
         description: Move the floating vMAJOR tag to the new release
         type: boolean
         default: true
+      client-id:
+        description: >-
+          Client ID of a GitHub App. With app-private-key, the release is created with an App
+          token so it triggers other workflows (GITHUB_TOKEN events don't)
+        type: string
+        default: ""
+    secrets:
+      app-private-key:
+        description: Private key of the GitHub App named by client-id
+        required: false
 
 permissions:
   contents: read
@@ -21,12 +31,20 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: app-token
+        if: ${{ inputs.client-id != '' }}
+        with:
+          client-id: ${{ inputs.client-id }}
+          private-key: ${{ secrets.app-private-key }}
+          permission-contents: write
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token || github.token }}
       - name: Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
           DRY_RUN: ${{ inputs.dry-run }}
           MOVE_MAJOR_TAG: ${{ inputs.move-major-tag }}
         run: |
