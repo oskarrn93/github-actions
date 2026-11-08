@@ -18,6 +18,7 @@ jobs:
 | `govulncheck.yml` | `packages` (`./...`), `version` |
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
 | `actionlint.yml` | none |
+| `terraform.yml` | `working-directory` (`.`), `version` (root module's `.terraform-version`, else latest) |
 | `semver-release.yml` | `dry-run` (false), `move-major-tag` (true), `client-id` (none), secret `app-private-key` (optional) |
 
 `semver-release.yml` infers the next `vMAJOR.MINOR.PATCH` from conventional commits since the latest tag (`!`/`BREAKING CHANGE` → major, `feat` → minor, `fix`/`perf` → patch, anything else → no release), creates the GitHub release, and moves `vMAJOR`. The caller's job needs `permissions: contents: write`. Releases created with `GITHUB_TOKEN` don't trigger other workflows (e.g. a build on tag push). Pass a GitHub App's `client-id` and `app-private-key` to create the release with an App token, which does.
