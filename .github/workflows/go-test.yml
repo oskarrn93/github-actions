@@ -1,0 +1,38 @@
+name: Go test
+
+on:
+  workflow_call:
+    inputs:
+      packages:
+        description: Package patterns to vet and test
+        type: string
+        default: ./...
+      race:
+        description: Run tests with the race detector
+        type: boolean
+        default: false
+      gofmt:
+        description: Fail if gofmt would change any file
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: go.mod
+      - if: inputs.gofmt
+        run: test -z "$(gofmt -l .)" || (gofmt -l .; exit 1)
+      - run: go vet ${PACKAGES}
+        env:
+          PACKAGES: ${{ inputs.packages }}
+      - run: go test ${RACE:+-race} ${PACKAGES}
+        env:
+          PACKAGES: ${{ inputs.packages }}
+          RACE: ${{ inputs.race && 'true' || '' }}
