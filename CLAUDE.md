@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Reusable GitHub Actions workflows (`.github/workflows/*.yml`) shared across the owner's other repos. There is no build, lint, or test tooling here; changes are validated by running the workflows from a caller repo. Workflows only define `workflow_call` — callers own the triggers (`schedule`, `push`, ...). Composite actions, if added, go in `actions/<name>/action.yml`.
+Reusable GitHub Actions workflows (`.github/workflows/*.yml`) shared across the owner's other repos. There is no build or test tooling here; `ci.yml` runs actionlint on PRs and pushes to main, and behavior is otherwise validated by running the workflows from a caller repo. Reusable workflows only define `workflow_call` — callers own the triggers (`schedule`, `push`, ...). `ci.yml` and `release.yml` are this repo's own, non-reusable workflows. Composite actions, if added, go in `actions/<name>/action.yml`.
 
 The README has a table of each workflow's inputs and defaults; update it when adding or changing inputs.
 
