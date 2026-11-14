@@ -1,0 +1,33 @@
+name: Ansible Lint
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory containing the playbooks and .ansible-lint
+        type: string
+        default: .
+      version:
+        description: ansible-lint version
+        type: string
+        default: 26.11.0
+
+permissions:
+  contents: read
+
+jobs:
+  ansible-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install "ansible-lint==${VERSION}"
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+        env:
+          VERSION: ${{ inputs.version }}
+      - run: '[ ! -f requirements.yml ] || ansible-galaxy collection install -r requirements.yml'
+      - run: ansible-lint
