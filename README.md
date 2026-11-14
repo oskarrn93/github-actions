@@ -19,6 +19,7 @@ jobs:
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
 | `actionlint.yml` | none |
 | `ansible-lint.yml` | `working-directory` (`.`), `version` |
+| `secrets-scan.yml` | `sops-files` (none; git pathspec, e.g. `'*.sops.*'`, enables the encrypted-files check) |
 | `terraform.yml` | `working-directory` (`.`), `version` (root module's `.terraform-version`, else latest) |
 | `semver-release.yml` | `dry-run` (false), `move-major-tag` (true), `create-release` (true), `client-id` (none), secret `app-private-key` (optional) |
 
