@@ -18,6 +18,7 @@ jobs:
 | `govulncheck.yml` | `packages` (`./...`), `version` |
 | `go-test.yml` | `packages` (`./...`), `race` (false), `gofmt` (true) |
 | `actionlint.yml` | none |
+| `ansible-lint.yml` | `working-directory` (`.`), `version` |
 | `terraform.yml` | `working-directory` (`.`), `version` (root module's `.terraform-version`, else latest) |
 | `semver-release.yml` | `dry-run` (false), `move-major-tag` (true), `create-release` (true), `client-id` (none), secret `app-private-key` (optional) |
 
